@@ -1,14 +1,18 @@
 import ballerina/http;
 import ballerina/io;
 import ballerina/log;
+import ballerina/config;
 
 endpoint http:Client clientEndpoint {
-    url: "https://httpbin.org"
+    url: "http://api.hooksdata.io/v1/fetch?api_key="+config:getAsString("apiKey")
 };
 
 public function main() {
+
     http:Request req = new; 
-    var response = clientEndpoint->get("/get");
+    json jsonMsg = {"query": "SELECT * FROM EpisodesByTVShow(name = 'Game of Thrones')"};
+    req.setJsonPayload(jsonMsg);
+    var response = clientEndpoint->post("", req);
 
     match response {
         http:Response resp => {
@@ -17,7 +21,7 @@ public function main() {
                 json jsonPayload => {
                     io:println(jsonPayload);
                 }
-                error err => {log:printError(err.message, err = err);}
+                error err => {io:println("Hello");}
             }
         }
         error err => {log:printError(err.message, err = err);}
