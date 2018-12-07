@@ -691,3 +691,5 @@ Caused by: sun.security.provider.certpath.SunCertPathBuilderException: unable to
 	at sun.security.validator.PKIXValidator.doBuild(PKIXValidator.java:392)
 	... 34 more
  
+[2018-12-06 23:37:28,729] ERROR {org.ballerinalang.net.http.HttpUtil} - call failed  
+[2018-12-06 23:50:38,217] ERROR {org.ballerinalang.net.http.BallerinaHTTPConnectorListener} - Error in HTTP server connector: Remote client closed the connection before initiating outbound response  
