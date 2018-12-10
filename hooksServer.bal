@@ -1,36 +1,49 @@
+import ballerina/config;
 import ballerina/http;
+import ballerina/io;
+
 
 endpoint http:Listener listener {
     port:9090
 };
 
-// Order management is done using an in memory map.
-// Add some sample orders to 'ordersMap' at startup.
-map<json> ordersMap;
+endpoint http:Client clientEndpoint {
+    url: "http://api.hooksdata.io/v1/fetch?api_key="+config:getAsString("apiKey")
+};
+
 
 // RESTful service.
 @http:ServiceConfig { basePath: "/tvShows" }
 service<http:Service> orderMgt bind listener {
 
-    // Resource that handles the HTTP GET requests that are directed to a specific
-    // order using path '/order/<orderId>'.
     @http:ResourceConfig {
-        methods: ["GET"],
-        path: "/show/{showName}"
+        methods: ["POST"],
+        path: "/show"
     }
-    findOrder(endpoint client, http:Request req, string showName) {
-        // Find the requested order from the map and retrieve it in JSON format.
-        // json? payload = ordersMap[orderId];
-        // http:Response response;
-        // if (payload == null) {
-            // payload = "Order : " + orderId + " cannot be found.";
-        // }
+    findOrder(endpoint client, http:Request req) {
+        
+        http:Request outBoundRequest = new;
+        
 
-        // Set the JSON payload in the outgoing response message.
-        // response.setJsonPayload(untaint payload);
+        var result = req.getJsonPayload();
+        http:Response res = new;
 
-        // Send response to the client.
-        _ = client->respond({"great": untaint showName});
+        match result {
+            json value => {
+                // res.statusCode = 200;
+                // io:println(value.getKeys()); 
+                json jsonMsg = {"query": "SELECT * FROM EpisodesByTVShow(name = 'Game of Thrones')"};
+                outBoundRequest.setJsonPayload(jsonMsg);
+                http:Response response = check clientEndpoint->post("", outBoundRequest);
+                json data = check response.getJsonPayload();
+                res.setPayload(untaint data);
+            }
+            error err => {
+                res.statusCode = 400;
+                res.setPayload("JSON containted invalid data");
+            }
+        }
+        _ = client->respond(res);
     }
 
 
