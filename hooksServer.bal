@@ -30,10 +30,11 @@ service<http:Service> orderMgt bind listener {
 
         match result {
             json value => {
-                // res.statusCode = 200;
-                // io:println(value.getKeys()); 
-                json jsonMsg = {"query": "SELECT * FROM EpisodesByTVShow(name = 'Game of Thrones')"};
-                outBoundRequest.setJsonPayload(jsonMsg);
+                json tvShow = check req.getJsonPayload();
+                string dataSet = tvShow.tvShow.toString();
+                string queryString = string `SELECT * FROM EpisodesByTVShow(name = '{{dataSet}}')`;
+                json jsonMsg = {"query": queryString};
+                outBoundRequest.setJsonPayload(untaint jsonMsg);
                 http:Response response = check clientEndpoint->post("", outBoundRequest);
                 json data = check response.getJsonPayload();
                 res.setPayload(untaint data);
