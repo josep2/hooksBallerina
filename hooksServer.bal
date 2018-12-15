@@ -7,6 +7,10 @@ endpoint http:Listener listener {
     port:9090
 };
 
+type Query record {
+    string tvShow;
+};
+
 endpoint http:Client clientEndpoint {
     url: "http://api.hooksdata.io/v1/fetch?api_key="+config:getAsString("apiKey")
 };
@@ -14,16 +18,19 @@ endpoint http:Client clientEndpoint {
 
 // RESTful service.
 @http:ServiceConfig { basePath: "/tvShows" }
-service<http:Service> orderMgt bind listener {
+service<http:Service> tvShows bind listener {
 
     @http:ResourceConfig {
         methods: ["POST"],
-        path: "/show"
+        path: "/show",
+        body: "oblong",
+        consumes: ["application/json"]
     }
-    findOrder(endpoint client, http:Request req) {
+    findShow(endpoint client, http:Request req, Query oblong) {
         
         http:Request outBoundRequest = new;
-        
+
+        io:println(oblong);
 
         var result = req.getJsonPayload();
         http:Response res = new;
