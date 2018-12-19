@@ -1,6 +1,7 @@
 import ballerina/config;
 import ballerina/http;
 import ballerina/io;
+import ballerinax/docker;
 
 
 endpoint http:Listener listener {
