@@ -3,7 +3,7 @@ import ballerina/http;
 import ballerina/io;
 import ballerinax/docker;
 
-
+@docker:Expose{}
 endpoint http:Listener listener {
     port:9090
 };
@@ -18,8 +18,9 @@ endpoint http:Client clientEndpoint {
 
 
 // RESTful service.
+@docker:Config {}
 @http:ServiceConfig { basePath: "/tvShows" }
-service<http:Service> tvShows bind listener {
+service<http:Service> tvshows bind listener {
 
     @http:ResourceConfig {
         methods: ["POST"],
@@ -54,7 +55,5 @@ service<http:Service> tvShows bind listener {
         }
         _ = client->respond(res);
     }
-
-
 
 }
